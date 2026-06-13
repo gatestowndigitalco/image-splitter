@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Image Grid Splitter — GatesTown Digital Co.</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --lime:#C8F400;--lime-dark:#a8d000;--lime-pale:#f4ffe0;
+  --pink:#FF3DAA;--pink-dark:#d4008a;--pink-pale:#fff0f8;
+  --black:#0a0a0a;--white:#ffffff;
+  --g50:#f8f8f8;--g100:#f0f0f0;--g150:#e8e8e8;--g200:#e0e0e0;--g400:#999;--g600:#555;
+  --r:14px;--rs:8px;
+  --sh:0 2px 14px rgba(0,0,0,.07);
+  --shm:0 6px 28px rgba(0,0,0,.12);
+  --shl:0 14px 52px rgba(0,0,0,.18);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--g50);color:var(--black);min-height:100vh;display:flex;flex-direction:column}
+
+/* HEADER */
+header{background:var(--black);padding:15px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.98rem;color:#fff;display:flex;align-items:center;gap:8px;letter-spacing:-.02em}
+.logo-pip{width:9px;height:9px;border-radius:50%;background:var(--lime)}
+.hbadge{background:var(--lime);color:var(--black);font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.67rem;padding:4px 10px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase}
+
+/* HERO */
+.hero{background:var(--black);padding:44px 28px 54px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 110%,rgba(200,244,0,.1),transparent);pointer-events:none}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--lime),var(--pink),var(--lime))}
+.hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.8rem,4.5vw,3rem);font-weight:700;color:#fff;letter-spacing:-.03em;line-height:1.08;max-width:660px;margin:0 auto 12px}
+.hero h1 em{font-style:normal;color:var(--lime)}
+.hero p{color:var(--g400);font-size:.92rem;max-width:460px;margin:0 auto;line-height:1.65}
+.hero-pills{display:flex;justify-content:center;gap:7px;margin-top:16px;flex-wrap:wrap}
+.hp{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--g400);font-size:.7rem;padding:4px 11px;border-radius:20px;font-family:'Space Grotesk',sans-serif;font-weight:500}
+.hp strong{color:var(--lime)}
+
+/* MAIN */
+main{flex:1;max-width:1200px;width:100%;margin:0 auto;padding:28px 22px 68px}
+
+/* UPLOAD */
+.upload-zone{border:2.5px dashed var(--g200);border-radius:var(--r);padding:48px 28px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;background:#fff}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--lime);background:var(--lime-pale);transform:scale(1.003)}
+.upload-zone input{display:none}
+.uicon{width:64px;height:64px;background:var(--black);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:1.7rem;transition:transform .2s}
+.upload-zone:hover .uicon{transform:scale(1.07) rotate(-5deg)}
+.upload-zone h2{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:700;margin-bottom:6px}
+.upload-zone p{color:var(--g600);font-size:.85rem;line-height:1.55}
+.uhint{display:inline-flex;align-items:center;gap:5px;margin-top:12px;background:var(--g100);padding:5px 13px;border-radius:20px;font-size:.74rem;color:var(--g600)}
+
+/* SETTINGS */
+.sbar{display:none;background:#fff;border-radius:var(--r);padding:14px 18px;margin-top:12px;box-shadow:var(--sh);align-items:center;gap:14px;flex-wrap:wrap}
+.sbar.show{display:flex}
+.sg{display:flex;align-items:center;gap:7px}
+.sg label{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.79rem;white-space:nowrap}
+.sg input[type=number]{width:62px;padding:6px 8px;border:2px solid var(--g200);border-radius:var(--rs);font-size:.86rem;font-family:'Space Grotesk',sans-serif;font-weight:600;text-align:center;transition:border-color .2s}
+.sg input[type=number]:focus{outline:none;border-color:var(--lime)}
+.sg select{padding:6px 10px;border:2px solid var(--g200);border-radius:var(--rs);font-size:.8rem;font-family:'DM Sans',sans-serif;background:#fff;cursor:pointer;transition:border-color .2s}
+.sg select:focus{outline:none;border-color:var(--lime)}
+.vd{width:1px;height:24px;background:var(--g200)}
+.btn-preview{background:var(--g100);color:var(--black);border:2px solid var(--g200);padding:8px 16px;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.btn-preview:hover{background:var(--g150);border-color:var(--g400)}
+.btn-split{margin-left:auto;background:var(--lime);color:var(--black);border:none;padding:9px 20px;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;transition:background .2s,transform .1s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.btn-split:hover{background:var(--lime-dark);transform:translateY(-1px)}
+.btn-split:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+/* ── GRID PREVIEW PANEL ── */
+.grid-preview-panel{display:none;background:#fff;border-radius:var(--r);margin-top:12px;box-shadow:var(--sh);overflow:hidden}
+.grid-preview-panel.show{display:block}
+.gpp-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1.5px solid var(--g100)}
+.gpp-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.95rem;display:flex;align-items:center;gap:8px}
+.gpp-pill{background:var(--lime);color:var(--black);border-radius:5px;padding:2px 9px;font-size:.72rem;font-weight:700}
+.gpp-tip{font-size:.75rem;color:var(--g400);font-family:'Space Grotesk',sans-serif}
+.gpp-body{padding:16px 18px;overflow:auto}
+
+/* The overlay canvas container */
+.overlay-wrap{
+  position:relative;
+  display:inline-block;
+  max-width:100%;
+  user-select:none;
+}
+.overlay-wrap img{
+  display:block;
+  max-width:100%;
+  max-height:520px;
+  width:auto;
+  height:auto;
+  border-radius:var(--rs);
+}
+/* The SVG overlay sits exactly on top of the image */
+.overlay-svg{
+  position:absolute;
+  top:0;left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  border-radius:var(--rs);
+}
+/* Cell number labels */
+.cell-label{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:11px;
+  font-weight:700;
+  fill:#fff;
+  text-shadow:0 1px 3px rgba(0,0,0,.8);
+  pointer-events:none;
+}
+/* Hover-over cell highlight */
+.overlay-hit{
+  position:absolute;
+  top:0;left:0;
+  width:100%;height:100%;
+  pointer-events:all;
+}
+
+/* PREVIEW strip (small thumbnail of original) */
+.prev-strip{display:none;background:#fff;border-radius:var(--r);padding:14px 16px;margin-top:12px;box-shadow:var(--sh)}
+.prev-strip.show{display:block}
+.slabel{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.7rem;color:var(--g400);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.pinner{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.pimgwrap{flex-shrink:0;border-radius:var(--rs);border:1.5px solid var(--g200);overflow:hidden;background:#000}
+.pimgwrap img{max-width:200px;max-height:140px;display:block;object-fit:contain}
+.pmeta{display:flex;flex-direction:column;gap:6px;padding-top:2px}
+.mpill{display:inline-flex;align-items:center;gap:5px;background:var(--g100);border-radius:6px;padding:4px 9px;font-size:.76rem}
+.mpill strong{font-family:'Space Grotesk',sans-serif;font-weight:600}
+.wpill{background:var(--pink-pale);border:1px solid rgba(255,61,170,.2)}
+.wpill strong{color:var(--pink)}
+
+/* PROGRESS */
+.progsec{display:none;background:#fff;border-radius:var(--r);padding:26px 22px;margin-top:12px;box-shadow:var(--sh);text-align:center}
+.progsec.show{display:block}
+.progtitle{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.98rem;margin-bottom:14px}
+.progwrap{background:var(--g100);border-radius:20px;height:9px;overflow:hidden;margin-bottom:8px}
+.progfill{height:100%;background:linear-gradient(90deg,var(--lime),#9ef000);border-radius:20px;width:0%;transition:width .3s ease}
+.progtext{font-size:.78rem;color:var(--g600)}
+
+/* RESULTS */
+.ressec{display:none;margin-top:24px}
+.ressec.show{display:block}
+.reshdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.restitle{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.15rem;display:flex;align-items:center;gap:8px}
+.cbadge{background:var(--lime);color:var(--black);border-radius:6px;padding:2px 9px;font-size:.86rem;font-weight:700}
+.resactions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn-dla{background:var(--black);color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .2s,transform .1s}
+.btn-dla:hover{background:#222;transform:translateY(-1px)}
+.btn-dla:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-upa{background:var(--pink);color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .2s,transform .1s}
+.btn-upa:hover{background:var(--pink-dark);transform:translateY(-1px)}
+.btn-upa:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+/* RESULT CARDS */
+.resgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.rcard{background:#fff;border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s}
+.rcard:hover{transform:translateY(-3px);box-shadow:var(--shm)}
+.cimgwrap{position:relative;width:100%;padding-top:100%;background:repeating-conic-gradient(#e2e2e2 0% 25%,#fff 0% 50%) 0 0/20px 20px;cursor:pointer;overflow:hidden}
+.cimgwrap:hover{background:repeating-conic-gradient(#d4d4d4 0% 25%,#f0f0f0 0% 50%) 0 0/20px 20px}
+.cimgwrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;padding:10px;transition:transform .2s}
+.cimgwrap:hover img{transform:scale(1.04)}
+.zhint{position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:.62rem;padding:2px 6px;border-radius:4px;opacity:0;transition:opacity .2s;font-family:'Space Grotesk',sans-serif;pointer-events:none}
+.cimgwrap:hover .zhint{opacity:1}
+.ubadge{position:absolute;top:6px;left:6px;background:var(--pink);color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.58rem;padding:2px 6px;border-radius:4px;letter-spacing:.04em;text-transform:uppercase}
+.lores-badge{position:absolute;top:6px;right:6px;background:rgba(255,61,170,.15);border:1px solid rgba(255,61,170,.3);color:var(--pink);font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.58rem;padding:2px 6px;border-radius:4px}
+.cbody{padding:10px 12px 12px;flex:1;display:flex;flex-direction:column;gap:5px}
+.cname{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmeta{font-size:.68rem;color:var(--g400)}
+.cactions{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:auto;padding-top:4px}
+.cbtn{border:none;padding:7px 0;border-radius:6px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.72rem;cursor:pointer;transition:background .15s,transform .1s;display:flex;align-items:center;justify-content:center;gap:4px}
+.cbtn:active{transform:scale(.97)}
+.cbtn-dl{background:var(--lime);color:var(--black)}
+.cbtn-dl:hover{background:var(--lime-dark)}
+.cbtn-up{background:var(--g100);color:var(--black)}
+.cbtn-up:hover{background:var(--g150)}
+.cbtn-up.done{background:var(--pink);color:#fff}
+.cbtn-up.done:hover{background:var(--pink-dark)}
+.cbtn-up:disabled{opacity:.4;cursor:not-allowed}
+
+/* LIGHTBOX */
+.lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:900;align-items:center;justify-content:center;padding:16px}
+.lb.open{display:flex}
+.lb-wrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;max-width:min(94vw,860px);width:100%}
+.lb-imgbox{width:100%;background:repeating-conic-gradient(#444 0% 25%,#2a2a2a 0% 50%) 0 0/28px 28px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;padding:20px;max-height:72vh;position:relative}
+.lb-imgbox img{max-width:100%;max-height:65vh;object-fit:contain;display:block;border-radius:var(--rs)}
+.lb-close{position:absolute;top:10px;right:10px;width:32px;height:32px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:50%;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;z-index:10}
+.lb-close:hover{background:rgba(255,255,255,.25)}
+.lb-info{text-align:center;color:rgba(255,255,255,.55);font-size:.78rem;font-family:'Space Grotesk',sans-serif}
+.lb-name{color:rgba(255,255,255,.85);font-weight:600;margin-bottom:4px;font-size:.85rem}
+.lb-nav{display:flex;gap:10px;align-items:center}
+.lb-nav button{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;padding:7px 18px;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.78rem;cursor:pointer;transition:background .15s}
+.lb-nav button:hover{background:rgba(255,255,255,.22)}
+.lb-nav button:disabled{opacity:.3;cursor:not-allowed}
+.lb-counter{color:rgba(255,255,255,.45);font-size:.75rem;font-family:'Space Grotesk',sans-serif;min-width:54px;text-align:center}
+.lb-actions{display:flex;gap:7px}
+.lb-btn-dl{background:var(--lime);color:var(--black);border:none;padding:7px 16px;border-radius:7px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;transition:background .15s}
+.lb-btn-dl:hover{background:var(--lime-dark)}
+.lb-btn-up{background:var(--pink);color:#fff;border:none;padding:7px 16px;border-radius:7px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;transition:background .15s}
+.lb-btn-up:hover{background:var(--pink-dark)}
+.lb-btn-up:disabled{opacity:.4;cursor:not-allowed}
+
+/* UPSCALE OVERLAY */
+.upov{display:none;position:fixed;inset:0;background:rgba(10,10,10,.82);z-index:950;align-items:center;justify-content:center}
+.upov.open{display:flex}
+.upbox{background:#fff;border-radius:var(--r);padding:32px 36px;max-width:340px;width:100%;text-align:center;box-shadow:var(--shl)}
+.upbox h3{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.05rem;margin-bottom:5px}
+.upbox p{color:var(--g600);font-size:.82rem;margin-bottom:16px;line-height:1.5}
+.upprogwrap{background:var(--g100);border-radius:20px;height:9px;overflow:hidden;margin-bottom:8px}
+.upprogfill{height:100%;background:linear-gradient(90deg,var(--pink),#ff80cc);border-radius:20px;width:0%;transition:width .3s}
+.upprogtext{font-size:.78rem;color:var(--g600)}
+
+/* RESET */
+.resetwrap{text-align:center;margin-top:30px}
+.btn-reset{background:none;border:2px solid var(--g200);padding:8px 18px;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.82rem;cursor:pointer;color:var(--g600);transition:border-color .2s,color .2s}
+.btn-reset:hover{border-color:var(--pink);color:var(--pink)}
+
+footer{background:var(--black);color:var(--g400);text-align:center;padding:16px;font-size:.74rem}
+footer a{color:var(--lime);text-decoration:none}
+footer a:hover{text-decoration:underline}
+
+.toast{position:fixed;bottom:20px;right:20px;background:var(--black);color:#fff;padding:10px 16px;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.8rem;display:flex;align-items:center;gap:8px;box-shadow:var(--shl);transform:translateY(60px);opacity:0;transition:all .25s ease;z-index:1000;max-width:280px}
+.toast.show{transform:translateY(0);opacity:1}
+.tpip{width:7px;height:7px;border-radius:50%;background:var(--lime);flex-shrink:0}
+
+@media(max-width:620px){
+  header{padding:12px 14px}
+  main{padding:18px 12px 50px}
+  .sbar{gap:10px}
+  .btn-split,.btn-preview{margin-left:0;width:100%;justify-content:center}
+  .resactions{width:100%}
+  .btn-dla,.btn-upa{flex:1;justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><div class="logo-pip"></div>GatesTown Digital Co.</div>
+  <div class="hbadge">Image Splitter Pro</div>
+</header>
+
+<div class="hero">
+  <h1>Split. Preview. <em>Download.</em></h1>
+  <p>Upload any image sheet — sticker packs, icon grids, character sets — preview the split lines live, then export every image at 300 DPI with a white background.</p>
+  <div class="hero-pills">
+    <span class="hp"><strong>Grid Preview</strong> Before Split</span>
+    <span class="hp"><strong>300 DPI</strong> Output</span>
+    <span class="hp"><strong>White BG</strong> Ready</span>
+    <span class="hp"><strong>Upscale</strong> to 4000px</span>
+    <span class="hp"><strong>Lightbox</strong> Preview</span>
+    <span class="hp"><strong>Edge Trim</strong> No Bleed</span>
+  </div>
+</div>
+
+<main>
+
+  <!-- UPLOAD -->
+  <div class="upload-zone" id="uploadZone">
+    <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp"/>
+    <div class="uicon">🖼️</div>
+    <h2>Drop your image sheet here</h2>
+    <p>PNG, JPG, or WebP — works best with solid color backgrounds<br>(black, white, or any flat background color)</p>
+    <span class="uhint">📂 Click to browse or drag & drop</span>
+  </div>
+
+  <!-- SETTINGS BAR -->
+  <div class="sbar" id="sbar">
+    <div class="sg"><label>Cols</label><input type="number" id="inCols" value="4" min="1" max="30"/></div>
+    <div class="sg"><label>Rows</label><input type="number" id="inRows" value="3" min="1" max="30"/></div>
+    <div class="vd"></div>
+    <div class="sg">
+      <label>Padding</label>
+      <select id="inPad">
+        <option value="0">None</option>
+        <option value="10" selected>Small (10px)</option>
+        <option value="24">Medium (24px)</option>
+        <option value="48">Large (48px)</option>
+      </select>
+    </div>
+    <div class="sg">
+      <label>Split mode</label>
+      <select id="inMode">
+        <option value="auto" selected>Auto-detect</option>
+        <option value="grid">Even Grid</option>
+      </select>
+    </div>
+    <div class="vd"></div>
+    <div class="sg">
+      <label>Upscale to</label>
+      <select id="inUpscale">
+        <option value="0" selected>No upscale</option>
+        <option value="1000">1000px</option>
+        <option value="2000">2000px</option>
+        <option value="3000">3000px</option>
+        <option value="4000">4000px</option>
+      </select>
+    </div>
+    <div class="vd"></div>
+    <div class="sg">
+      <label>Edge trim</label>
+      <select id="inGutter" title="Trims the edge of each cell inward before scanning for content — removes bleed-in from neighboring images">
+        <option value="0">None</option>
+        <option value="2">Tiny (2%)</option>
+        <option value="4" selected>Small (4%)</option>
+        <option value="7">Medium (7%)</option>
+        <option value="12">Large (12%)</option>
+        <option value="18">X-Large (18%)</option>
+      </select>
+    </div>
+    <button class="btn-preview" id="btnPreview">👁 Preview Grid</button>
+    <button class="btn-split" id="btnSplit">✂️ Split Images</button>
+  </div>
+
+  <!-- GRID PREVIEW PANEL -->
+  <div class="grid-preview-panel" id="gridPreviewPanel">
+    <div class="gpp-header">
+      <div class="gpp-title">
+        🔲 Grid Preview
+        <span class="gpp-pill" id="gppLabel">4 × 3 = 12 cells</span>
+      </div>
+      <div class="gpp-tip">Hover a cell to highlight it · Adjust Cols/Rows above and click Preview Grid to update</div>
+    </div>
+    <div class="gpp-body">
+      <div class="overlay-wrap" id="overlayWrap">
+        <img id="overlayImg" src="" alt="preview"/>
+        <svg class="overlay-svg" id="overlaySvg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+        <!-- Invisible hit grid for hover highlighting -->
+        <div class="overlay-hit" id="overlayHit"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORIGINAL THUMB STRIP -->
+  <div class="prev-strip" id="prevStrip">
+    <div class="slabel">Uploaded Image</div>
+    <div class="pinner">
+      <div class="pimgwrap"><img id="prevImg" src="" alt="preview"/></div>
+      <div class="pmeta">
+        <div class="mpill">📐 Size: <strong id="mSize">—</strong></div>
+        <div class="mpill">🎨 Format: <strong id="mFmt">—</strong></div>
+        <div class="mpill">📦 File: <strong id="mFile">—</strong></div>
+        <div class="mpill wpill" id="mWarn" style="display:none">⚠️ Low res — <strong>upscale recommended</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progsec" id="progsec">
+    <div class="progtitle">✨ Splitting your images...</div>
+    <div class="progwrap"><div class="progfill" id="progfill"></div></div>
+    <div class="progtext" id="progtext">Analyzing image...</div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="ressec" id="ressec">
+    <div class="reshdr">
+      <div class="restitle">Split Results <span class="cbadge" id="ccount">0</span></div>
+      <div class="resactions">
+        <button class="btn-upa" id="btnUpa">⬆️ Upscale All</button>
+        <button class="btn-dla" id="btnDla">⬇️ Download All ZIP</button>
+      </div>
+    </div>
+    <div class="resgrid" id="resgrid"></div>
+    <div class="resetwrap"><button class="btn-reset" id="btnReset">↩ Start Over</button></div>
+  </div>
+
+</main>
+
+<footer>Built by <a href="https://gatestowndigitalco.com" target="_blank">GatesTown Digital Co.</a> — AI Tools for Creators</footer>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb">
+  <div class="lb-wrap">
+    <div class="lb-imgbox">
+      <button class="lb-close" id="lbClose">✕</button>
+      <img id="lbImg" src="" alt="preview"/>
+    </div>
+    <div class="lb-info">
+      <div class="lb-name" id="lbName"></div>
+      <div id="lbMeta"></div>
+    </div>
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center">
+      <div class="lb-nav">
+        <button id="lbPrev">← Prev</button>
+        <div class="lb-counter" id="lbCounter">1 / 1</div>
+        <button id="lbNext">Next →</button>
+      </div>
+      <div class="lb-actions">
+        <button class="lb-btn-dl" id="lbDl">⬇ Download</button>
+        <button class="lb-btn-up" id="lbUp">⬆ Upscale</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- UPSCALE OVERLAY -->
+<div class="upov" id="upov">
+  <div class="upbox">
+    <h3>✨ Upscaling...</h3>
+    <p id="upovText">Processing with high-quality bicubic scaling.</p>
+    <div class="upprogwrap"><div class="upprogfill" id="upprogfill"></div></div>
+    <div class="upprogtext" id="upprogtext">Starting...</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><div class="tpip"></div><span id="toastMsg"></span></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+// ── STATE ──
+let srcImage = null;
+let srcFileName = 'image';
+let srcImgData = null; // cached ImageData for band detection
+let results = [];
+let lbIdx = 0;
+let lastRowBands = null;
+let lastColBands = null;
+
+// ── ELEMENTS ──
+const uploadZone       = document.getElementById('uploadZone');
+const fileInput        = document.getElementById('fileInput');
+const sbar             = document.getElementById('sbar');
+const prevStrip        = document.getElementById('prevStrip');
+const prevImg          = document.getElementById('prevImg');
+const gridPreviewPanel = document.getElementById('gridPreviewPanel');
+const overlayImg       = document.getElementById('overlayImg');
+const overlaySvg       = document.getElementById('overlaySvg');
+const overlayHit       = document.getElementById('overlayHit');
+const gppLabel         = document.getElementById('gppLabel');
+const progsec          = document.getElementById('progsec');
+const progfill         = document.getElementById('progfill');
+const progtext         = document.getElementById('progtext');
+const ressec           = document.getElementById('ressec');
+const resgrid          = document.getElementById('resgrid');
+const ccount           = document.getElementById('ccount');
+const btnPreview       = document.getElementById('btnPreview');
+const btnSplit         = document.getElementById('btnSplit');
+const btnDla           = document.getElementById('btnDla');
+const btnUpa           = document.getElementById('btnUpa');
+const btnReset         = document.getElementById('btnReset');
+const lb               = document.getElementById('lb');
+const lbImg            = document.getElementById('lbImg');
+const lbName           = document.getElementById('lbName');
+const lbMeta           = document.getElementById('lbMeta');
+const lbClose          = document.getElementById('lbClose');
+const lbPrev           = document.getElementById('lbPrev');
+const lbNext           = document.getElementById('lbNext');
+const lbCounter        = document.getElementById('lbCounter');
+const lbDl             = document.getElementById('lbDl');
+const lbUp             = document.getElementById('lbUp');
+const upov             = document.getElementById('upov');
+const upprogfill       = document.getElementById('upprogfill');
+const upprogtext       = document.getElementById('upprogtext');
+const mWarn            = document.getElementById('mWarn');
+
+// ── TOAST ──
+function toast(msg,dur=3000){
+  document.getElementById('toastMsg').textContent=msg;
+  const el=document.getElementById('toast');
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),dur);
+}
+
+// ── UPLOAD ──
+uploadZone.addEventListener('dragover',e=>{e.preventDefault();uploadZone.classList.add('drag-over')});
+uploadZone.addEventListener('dragleave',()=>uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop',e=>{e.preventDefault();uploadZone.classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f)handleFile(f)});
+uploadZone.addEventListener('click',()=>fileInput.click());
+fileInput.addEventListener('change',()=>{if(fileInput.files[0])handleFile(fileInput.files[0])});
+
+function handleFile(file){
+  if(!file.type.startsWith('image/')){toast('Please upload an image file.');return}
+  srcFileName=file.name.replace(/\.[^.]+$/,'');
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      srcImage=img;
+      // Cache pixel data
+      const c=document.createElement('canvas');
+      c.width=img.width;c.height=img.height;
+      c.getContext('2d').drawImage(img,0,0);
+      srcImgData=c.getContext('2d').getImageData(0,0,img.width,img.height);
+
+      prevImg.src=e.target.result;
+      overlayImg.src=e.target.result;
+      document.getElementById('mSize').textContent=`${img.width} × ${img.height}px`;
+      document.getElementById('mFmt').textContent=file.type.replace('image/','').toUpperCase();
+      document.getElementById('mFile').textContent=(file.size/1024).toFixed(0)+' KB';
+      const isLow=img.width<500||img.height<500;
+      mWarn.style.display=isLow?'inline-flex':'none';
+      if(isLow) document.getElementById('inUpscale').value='3000';
+
+      sbar.classList.add('show');
+      prevStrip.classList.add('show');
+      gridPreviewPanel.classList.remove('show');
+      ressec.classList.remove('show');
+      progsec.classList.remove('show');
+      lastRowBands=null; lastColBands=null;
+      toast('Image loaded — click Preview Grid to check split lines!');
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── AUTO-UPDATE PREVIEW when cols/rows/mode/gutter change ──
+['inCols','inRows','inMode','inGutter'].forEach(id=>{
+  document.getElementById(id).addEventListener('change',()=>{
+    if(gridPreviewPanel.classList.contains('show')) renderGridOverlay();
+  });
+  document.getElementById(id).addEventListener('input',()=>{
+    if(gridPreviewPanel.classList.contains('show')) renderGridOverlay();
+  });
+});
+
+// ── PREVIEW GRID BUTTON ──
+btnPreview.addEventListener('click',()=>{
+  if(!srcImage){toast('Upload an image first!');return}
+  gridPreviewPanel.classList.add('show');
+  renderGridOverlay();
+  // scroll into view smoothly
+  gridPreviewPanel.scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+// ── RENDER GRID OVERLAY ──
+function renderGridOverlay(){
+  if(!srcImage||!srcImgData) return;
+
+  const cols=parseInt(document.getElementById('inCols').value)||4;
+  const rows=parseInt(document.getElementById('inRows').value)||3;
+  const mode=document.getElementById('inMode').value;
+  const W=srcImage.width, H=srcImage.height;
+
+  let rowBands, colBands;
+  if(mode==='auto'){
+    const bg=detectBg(srcImgData,W,H);
+    rowBands=findBands(srcImgData,W,H,'row',bg,rows);
+    colBands=findBands(srcImgData,W,H,'col',bg,cols);
+  } else {
+    rowBands=evenSplit(H,rows);
+    colBands=evenSplit(W,cols);
+  }
+
+  lastRowBands=rowBands; lastColBands=colBands;
+  const total=rowBands.length*colBands.length;
+  gppLabel.textContent=`${colBands.length} × ${rowBands.length} = ${total} cells`;
+
+  // Build SVG lines + cell rects
+  // SVG viewBox = image pixel dimensions for precision
+  overlaySvg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  overlaySvg.innerHTML='';
+
+  const LIME='#C8F400';
+  const PINK='#FF3DAA';
+
+  // Semi-transparent overlay per cell (for hover highlight)
+  // We draw all cells first, then lines on top
+  const cellGroup=document.createElementNS('http://www.w3.org/2000/svg','g');
+  cellGroup.setAttribute('id','cellGroup');
+  overlaySvg.appendChild(cellGroup);
+
+  let cellIdx=0;
+  for(let ri=0;ri<rowBands.length;ri++){
+    for(let ci=0;ci<colBands.length;ci++){
+      const x=colBands[ci][0], y=rowBands[ri][0];
+      const w=colBands[ci][1]-colBands[ci][0];
+      const h=rowBands[ri][1]-rowBands[ri][0];
+
+      // Cell rect (invisible by default, highlighted on hover)
+      const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      rect.setAttribute('x',x); rect.setAttribute('y',y);
+      rect.setAttribute('width',w); rect.setAttribute('height',h);
+      rect.setAttribute('fill','rgba(200,244,0,0)');
+      rect.setAttribute('stroke',LIME);
+      rect.setAttribute('stroke-width', Math.max(1, Math.round(W/300)));
+      rect.setAttribute('data-idx',cellIdx);
+      rect.setAttribute('class','cell-rect');
+      cellGroup.appendChild(rect);
+
+      // Cell number label
+      const fontSize=Math.max(10,Math.min(28,Math.round(Math.min(w,h)*0.22)));
+      const text=document.createElementNS('http://www.w3.org/2000/svg','text');
+      text.setAttribute('x',x+w/2); text.setAttribute('y',y+h/2+fontSize*0.35);
+      text.setAttribute('text-anchor','middle');
+      text.setAttribute('font-size',fontSize);
+      text.setAttribute('font-family','Space Grotesk, sans-serif');
+      text.setAttribute('font-weight','700');
+      text.setAttribute('fill','rgba(255,255,255,0.85)');
+      text.setAttribute('stroke','rgba(0,0,0,0.5)');
+      text.setAttribute('stroke-width','0.5');
+      text.setAttribute('paint-order','stroke');
+      text.textContent=String(cellIdx+1);
+      overlaySvg.appendChild(text);
+
+      cellIdx++;
+    }
+  }
+
+  // Horizontal lines (row boundaries)
+  const allRowEdges=new Set();
+  for(const[s,e] of rowBands){allRowEdges.add(s);allRowEdges.add(e)}
+  for(const y of allRowEdges){
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',0);line.setAttribute('y1',y);
+    line.setAttribute('x2',W);line.setAttribute('y2',y);
+    line.setAttribute('stroke',LIME);
+    line.setAttribute('stroke-width',Math.max(1.5,Math.round(W/250)));
+    line.setAttribute('opacity','0.9');
+    overlaySvg.appendChild(line);
+  }
+  // Vertical lines (col boundaries)
+  const allColEdges=new Set();
+  for(const[s,e] of colBands){allColEdges.add(s);allColEdges.add(e)}
+  for(const x of allColEdges){
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x);line.setAttribute('y1',0);
+    line.setAttribute('x2',x);line.setAttribute('y2',H);
+    line.setAttribute('stroke',LIME);
+    line.setAttribute('stroke-width',Math.max(1.5,Math.round(H/250)));
+    line.setAttribute('opacity','0.9');
+    overlaySvg.appendChild(line);
+  }
+
+  // Build invisible hit divs for hover highlight
+  buildHitGrid(rowBands,colBands,W,H);
+}
+
+// Build invisible hover divs that highlight the corresponding SVG rect
+function buildHitGrid(rowBands,colBands,imgW,imgH){
+  overlayHit.innerHTML='';
+
+  // We need to map from % coordinates to image coordinates
+  // The overlay image is displayed at CSS size, SVG maps to 100%
+  let cellIdx=0;
+  for(let ri=0;ri<rowBands.length;ri++){
+    for(let ci=0;ci<colBands.length;ci++){
+      const xPct=(colBands[ci][0]/imgW)*100;
+      const yPct=(rowBands[ri][0]/imgH)*100;
+      const wPct=((colBands[ci][1]-colBands[ci][0])/imgW)*100;
+      const hPct=((rowBands[ri][1]-rowBands[ri][0])/imgH)*100;
+
+      const div=document.createElement('div');
+      div.style.cssText=`
+        position:absolute;
+        left:${xPct}%;top:${yPct}%;
+        width:${wPct}%;height:${hPct}%;
+        cursor:crosshair;
+        z-index:10;
+      `;
+      div.dataset.idx=cellIdx;
+      div.title=`Cell ${cellIdx+1}`;
+
+      div.addEventListener('mouseenter',()=>{
+        // Highlight matching SVG rect
+        document.querySelectorAll('.cell-rect').forEach(r=>r.setAttribute('fill','rgba(200,244,0,0)'));
+        const target=document.querySelector(`.cell-rect[data-idx="${cellIdx}"]`);
+        if(target) target.setAttribute('fill','rgba(200,244,0,0.22)');
+      });
+      div.addEventListener('mouseleave',()=>{
+        document.querySelectorAll('.cell-rect').forEach(r=>r.setAttribute('fill','rgba(200,244,0,0)'));
+      });
+
+      overlayHit.appendChild(div);
+      cellIdx++;
+    }
+  }
+}
+
+// ── SPLIT ──
+btnSplit.addEventListener('click',async()=>{
+  if(!srcImage){toast('Upload an image first!');return}
+  btnSplit.disabled=true;
+  ressec.classList.remove('show');
+  progsec.classList.add('show');
+  results=[];
+  resgrid.innerHTML='';
+  await tick();
+
+  const cols=parseInt(document.getElementById('inCols').value)||4;
+  const rows=parseInt(document.getElementById('inRows').value)||3;
+  const pad=parseInt(document.getElementById('inPad').value)||0;
+  const mode=document.getElementById('inMode').value;
+  const upscaleTo=parseInt(document.getElementById('inUpscale').value)||0;
+  const W=srcImage.width, H=srcImage.height;
+
+  const srcCanvas=document.createElement('canvas');
+  srcCanvas.width=W; srcCanvas.height=H;
+  const srcCtx=srcCanvas.getContext('2d');
+  srcCtx.drawImage(srcImage,0,0);
+
+  setP(10,'Detecting grid...');await tick();
+
+  let rowBands,colBands;
+  if(mode==='auto'){
+    const bg=detectBg(srcImgData,W,H);
+    rowBands=findBands(srcImgData,W,H,'row',bg,rows);
+    colBands=findBands(srcImgData,W,H,'col',bg,cols);
+  } else {
+    rowBands=evenSplit(H,rows);
+    colBands=evenSplit(W,cols);
+  }
+
+  const total=rowBands.length*colBands.length;
+  setP(20,`Found ${rowBands.length} rows × ${colBands.length} cols = ${total} images`);
+  await tick();
+
+  const DPI=300/96;
+  const MIN_OUT=200;
+  const gutterPct=parseInt(document.getElementById('inGutter').value)||4;
+  let idx=0;
+
+  for(let ri=0;ri<rowBands.length;ri++){
+    for(let ci=0;ci<colBands.length;ci++){
+      const[rS,rE]=rowBands[ri];
+      const[cS,cE]=colBands[ci];
+      const cellW=cE-cS, cellH=rE-rS;
+      const crop=tightCrop(srcImgData,W,H,cS,rS,cellW,cellH,gutterPct);
+
+      let finalW=Math.max(MIN_OUT,Math.round(crop.w*DPI))+pad*2;
+      let finalH=Math.max(MIN_OUT,Math.round(crop.h*DPI))+pad*2;
+
+      if(upscaleTo>0){
+        const maxSide=Math.max(finalW,finalH);
+        if(maxSide<upscaleTo){
+          const scale=upscaleTo/maxSide;
+          finalW=Math.round(finalW*scale);
+          finalH=Math.round(finalH*scale);
+        }
+      }
+
+      const out=document.createElement('canvas');
+      out.width=finalW; out.height=finalH;
+      const ctx=out.getContext('2d');
+      ctx.fillStyle='#ffffff';
+      ctx.fillRect(0,0,finalW,finalH);
+      ctx.imageSmoothingEnabled=true;
+      ctx.imageSmoothingQuality='high';
+      ctx.drawImage(srcCanvas,cS+crop.x,rS+crop.y,crop.w,crop.h,pad,pad,finalW-pad*2,finalH-pad*2);
+
+      const blob=await canvasToBlob(out);
+      const name=`${srcFileName}_${String(idx+1).padStart(2,'0')}.png`;
+      const url=URL.createObjectURL(blob);
+      results.push({blob,name,w:finalW,h:finalH,isUpscaled:upscaleTo>0,url});
+      idx++;
+      setP(20+Math.round((idx/total)*72),`Processed ${idx} of ${total}...`);
+      await tick();
+    }
+  }
+
+  setP(100,'Done!');await tick();
+  renderCards();
+  progsec.classList.remove('show');
+  ressec.classList.add('show');
+  btnSplit.disabled=false;
+  toast(`✅ ${results.length} images split! Click any thumbnail to preview.`);
+  ressec.scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+// ── RENDER CARDS ──
+function renderCards(){
+  resgrid.innerHTML='';
+  ccount.textContent=results.length;
+  results.forEach((r,i)=>{
+    const isLow=(r.w<400||r.h<400)&&!r.isUpscaled;
+    const card=document.createElement('div');
+    card.className='rcard';
+    card.innerHTML=`
+      <div class="cimgwrap" data-idx="${i}">
+        <img src="${r.url}" alt="${r.name}" loading="lazy"/>
+        ${r.isUpscaled?'<div class="ubadge">⬆ Upscaled</div>':''}
+        ${isLow?'<div class="lores-badge">Low Res</div>':''}
+        <div class="zhint">🔍 Full preview</div>
+      </div>
+      <div class="cbody">
+        <div class="cname">${r.name}</div>
+        <div class="cmeta">${r.w} × ${r.h}px · 300 DPI · White BG</div>
+        <div class="cactions">
+          <button class="cbtn cbtn-dl" data-idx="${i}">⬇ Save</button>
+          <button class="cbtn cbtn-up ${r.isUpscaled?'done':''}" data-idx="${i}">${r.isUpscaled?'✓ Upscaled':'⬆ Upscale'}</button>
+        </div>
+      </div>
+    `;
+    resgrid.appendChild(card);
+  });
+}
+
+// ── CARD CLICKS ──
+resgrid.addEventListener('click',async e=>{
+  const wrap=e.target.closest('.cimgwrap');
+  if(wrap&&!e.target.closest('.cbtn')){openLb(parseInt(wrap.dataset.idx));return}
+  const dlBtn=e.target.closest('.cbtn-dl');
+  if(dlBtn){const i=parseInt(dlBtn.dataset.idx);dl(results[i].blob,results[i].name);return}
+  const upBtn=e.target.closest('.cbtn-up');
+  if(upBtn&&!upBtn.disabled&&!upBtn.classList.contains('done')){
+    const i=parseInt(upBtn.dataset.idx);
+    upBtn.disabled=true;upBtn.textContent='...';
+    await upscaleOne(i,3000);
+    upBtn.classList.add('done');upBtn.disabled=false;upBtn.textContent='✓ Upscaled';
+    refreshCardBadge(i);
+    toast('✅ Image upscaled to 3000px!');
+  }
+});
+
+function refreshCardBadge(i){
+  const wrap=resgrid.querySelectorAll('.cimgwrap')[i];
+  if(!wrap) return;
+  wrap.querySelector('img').src=results[i].url;
+  const old=wrap.querySelector('.ubadge,.lores-badge');
+  if(old) old.remove();
+  const b=document.createElement('div');b.className='ubadge';b.textContent='⬆ Upscaled';
+  wrap.appendChild(b);
+  const meta=resgrid.querySelectorAll('.cmeta')[i];
+  if(meta) meta.textContent=`${results[i].w} × ${results[i].h}px · 300 DPI · White BG`;
+}
+
+// ── UPSCALE ONE ──
+async function upscaleOne(idx,targetPx){
+  const r=results[idx];
+  const img=await blobToImg(r.blob);
+  const maxSide=Math.max(img.width,img.height);
+  if(maxSide>=targetPx) return;
+  const scale=targetPx/maxSide;
+  const nw=Math.round(img.width*scale),nh=Math.round(img.height*scale);
+  const c=document.createElement('canvas');
+  c.width=nw;c.height=nh;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,nw,nh);
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  ctx.drawImage(img,0,0,nw,nh);
+  const blob=await canvasToBlob(c);
+  URL.revokeObjectURL(r.url);
+  results[idx]={...r,blob,w:nw,h:nh,isUpscaled:true,url:URL.createObjectURL(blob)};
+}
+
+// ── UPSCALE ALL ──
+btnUpa.addEventListener('click',async()=>{
+  if(!results.length) return;
+  const toProcess=results.filter(r=>!r.isUpscaled);
+  if(!toProcess.length){toast('All images already upscaled!');return}
+  btnUpa.disabled=true;
+  document.getElementById('upovText').textContent=`Upscaling ${toProcess.length} images to 3000px...`;
+  upov.classList.add('open');
+  for(let i=0;i<results.length;i++){
+    if(results[i].isUpscaled) continue;
+    upprogfill.style.width=((i/results.length)*100)+'%';
+    upprogtext.textContent=`Processing ${i+1} of ${results.length}...`;
+    await tick();
+    await upscaleOne(i,3000);
+    const btns=resgrid.querySelectorAll('.cbtn-up');
+    if(btns[i]){btns[i].classList.add('done');btns[i].textContent='✓ Upscaled'}
+    refreshCardBadge(i);
+  }
+  upprogfill.style.width='100%';upprogtext.textContent='All done!';
+  await new Promise(r=>setTimeout(r,700));
+  upov.classList.remove('open');
+  btnUpa.disabled=false;
+  toast(`✅ All ${results.length} images upscaled!`);
+});
+
+// ── LIGHTBOX ──
+function openLb(idx){lbIdx=idx;updateLb();lb.classList.add('open');document.body.style.overflow='hidden'}
+function closeLb(){lb.classList.remove('open');document.body.style.overflow=''}
+function updateLb(){
+  const r=results[lbIdx];
+  lbImg.src=r.url;lbName.textContent=r.name;
+  lbMeta.innerHTML=`${r.w} × ${r.h}px · 300 DPI · White BG${r.isUpscaled?' · <strong style="color:var(--pink)">Upscaled</strong>':''}`;
+  lbCounter.textContent=`${lbIdx+1} / ${results.length}`;
+  lbPrev.disabled=lbIdx===0;lbNext.disabled=lbIdx===results.length-1;
+  lbUp.textContent=r.isUpscaled?'✓ Upscaled':'⬆ Upscale';lbUp.disabled=r.isUpscaled;
+}
+lbClose.addEventListener('click',closeLb);
+lb.addEventListener('click',e=>{if(e.target===lb)closeLb()});
+lbPrev.addEventListener('click',()=>{if(lbIdx>0){lbIdx--;updateLb()}});
+lbNext.addEventListener('click',()=>{if(lbIdx<results.length-1){lbIdx++;updateLb()}});
+document.addEventListener('keydown',e=>{
+  if(!lb.classList.contains('open'))return;
+  if(e.key==='Escape')closeLb();
+  if(e.key==='ArrowLeft'&&lbIdx>0){lbIdx--;updateLb()}
+  if(e.key==='ArrowRight'&&lbIdx<results.length-1){lbIdx++;updateLb()}
+});
+lbDl.addEventListener('click',()=>{const r=results[lbIdx];dl(r.blob,r.name)});
+lbUp.addEventListener('click',async()=>{
+  if(results[lbIdx].isUpscaled)return;
+  lbUp.disabled=true;lbUp.textContent='...';
+  await upscaleOne(lbIdx,3000);updateLb();
+  const btns=resgrid.querySelectorAll('.cbtn-up');
+  if(btns[lbIdx]){btns[lbIdx].classList.add('done');btns[lbIdx].textContent='✓ Upscaled'}
+  refreshCardBadge(lbIdx);
+  toast('✅ Upscaled!');
+});
+
+// ── DOWNLOAD ALL ──
+btnDla.addEventListener('click',async()=>{
+  if(!results.length)return;
+  btnDla.disabled=true;btnDla.textContent='⏳ Building ZIP...';
+  toast('Building ZIP...',6000);
+  const zip=new JSZip();
+  const folder=zip.folder('split_images');
+  for(const{blob,name}of results) folder.file(name,await blob.arrayBuffer());
+  const zblob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});
+  dl(zblob,`${srcFileName}_split_300dpi.zip`);
+  btnDla.disabled=false;btnDla.innerHTML='⬇️ Download All ZIP';
+  toast(`✅ ZIP downloaded — ${results.length} images!`);
+});
+
+// ── RESET ──
+btnReset.addEventListener('click',()=>{
+  srcImage=null;srcImgData=null;results=[];fileInput.value='';prevImg.src='';overlayImg.src='';
+  overlaySvg.innerHTML='';overlayHit.innerHTML='';lastRowBands=null;lastColBands=null;
+  sbar.classList.remove('show');prevStrip.classList.remove('show');
+  gridPreviewPanel.classList.remove('show');progsec.classList.remove('show');ressec.classList.remove('show');
+  resgrid.innerHTML='';btnSplit.disabled=false;btnDla.disabled=false;btnUpa.disabled=false;
+  btnDla.innerHTML='⬇️ Download All ZIP';btnUpa.innerHTML='⬆️ Upscale All';
+  toast('Reset! Upload a new image.');
+});
+
+// ── HELPERS ──
+function setP(pct,msg){progfill.style.width=pct+'%';progtext.textContent=msg}
+function tick(){return new Promise(r=>requestAnimationFrame(()=>setTimeout(r,0)))}
+function canvasToBlob(c){return new Promise(res=>c.toBlob(res,'image/png'))}
+function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click()}
+function blobToImg(blob){
+  return new Promise((res,rej)=>{
+    const u=URL.createObjectURL(blob);const img=new Image();
+    img.onload=()=>res(img);img.onerror=rej;img.src=u;
+  });
+}
+
+// ── BACKGROUND COLOR DETECTOR (cached per call) ──
+let _cachedBg=null, _cachedBgKey='';
+function getBgColor(d,imgW,imgH){
+  // Sample outer ring of full image to find background
+  const step=Math.max(1,Math.floor(Math.min(imgW,imgH)/32));
+  const cc={};
+  for(let x=0;x<imgW;x+=step){
+    for(const fy of[0,imgH-1]){
+      const i=(fy*imgW+x)*4;
+      const k=`${Math.round(d[i]/16)*16},${Math.round(d[i+1]/16)*16},${Math.round(d[i+2]/16)*16}`;
+      cc[k]=(cc[k]||0)+1;
+    }
+  }
+  for(let y=0;y<imgH;y+=step){
+    for(const fx of[0,imgW-1]){
+      const i=(y*imgW+fx)*4;
+      const k=`${Math.round(d[i]/16)*16},${Math.round(d[i+1]/16)*16},${Math.round(d[i+2]/16)*16}`;
+      cc[k]=(cc[k]||0)+1;
+    }
+  }
+  const[bgKey]=Object.entries(cc).sort((a,b)=>b[1]-a[1])[0];
+  return bgKey.split(',').map(Number); // [r,g,b]
+}
+
+// ── MAIN CROP FUNCTION ──
+// Strategy: downsample the cell, build a binary content map,
+// find the LARGEST connected blob (= the main image),
+// discard all smaller disconnected fragments (= neighbor bleed),
+// then return the tight bounding box of that blob only.
+function tightCrop(imgData,imgW,imgH,cellX,cellY,cellW,cellH,gutterPct=4){
+  const d=imgData.data;
+  const[bgR,bgG,bgB]=getBgColor(d,imgW,imgH);
+  const THRESH=42; // color distance to count as "content"
+
+  const isBgPx=(gx,gy)=>{
+    if(gx<0||gy<0||gx>=imgW||gy>=imgH)return true;
+    const i=(gy*imgW+gx)*4;
+    if(d[i+3]<25)return true; // transparent
+    return Math.abs(d[i]-bgR)+Math.abs(d[i+1]-bgG)+Math.abs(d[i+2]-bgB)<THRESH;
+  };
+
+  // ── Step 1: Build a downsampled binary map of the cell ──
+  // We use a stride so even large cells process fast
+  const STRIDE=Math.max(1,Math.floor(Math.min(cellW,cellH)/120));
+  const mapW=Math.ceil(cellW/STRIDE);
+  const mapH=Math.ceil(cellH/STRIDE);
+  const map=new Uint8Array(mapW*mapH); // 1=content, 0=bg
+
+  for(let my=0;my<mapH;my++){
+    for(let mx=0;mx<mapW;mx++){
+      const gx=cellX+mx*STRIDE;
+      const gy=cellY+my*STRIDE;
+      map[my*mapW+mx]=isBgPx(gx,gy)?0:1;
+    }
+  }
+
+  // ── Step 2: Connected-component labeling (flood fill) ──
+  // Find all content blobs and their sizes
+  const labels=new Int32Array(mapW*mapH).fill(-1);
+  const blobs=[]; // [{size, minX, maxX, minY, maxY, centerX, centerY}]
+
+  const floodFill=(startIdx,label)=>{
+    const stack=[startIdx];
+    let size=0;
+    let mnX=mapW,mxX=0,mnY=mapH,mxY=0;
+    while(stack.length){
+      const idx=stack.pop();
+      if(idx<0||idx>=mapW*mapH)continue;
+      if(labels[idx]!=-1||map[idx]===0)continue;
+      labels[idx]=label;
+      size++;
+      const mx=idx%mapW, my=Math.floor(idx/mapW);
+      if(mx<mnX)mnX=mx;if(mx>mxX)mxX=mx;
+      if(my<mnY)mnY=my;if(my>mxY)mxY=my;
+      // 4-connected neighbors
+      if(mx>0)     stack.push(idx-1);
+      if(mx<mapW-1)stack.push(idx+1);
+      if(my>0)     stack.push(idx-mapW);
+      if(my<mapH-1)stack.push(idx+mapW);
+    }
+    if(size>0){
+      blobs.push({
+        label,size,
+        minX:mnX,maxX:mxX,minY:mnY,maxY:mxY,
+        centerX:(mnX+mxX)/2,centerY:(mnY+mxY)/2
+      });
+    }
+  };
+
+  let nextLabel=0;
+  for(let i=0;i<mapW*mapH;i++){
+    if(map[i]===1&&labels[i]===-1){
+      floodFill(i,nextLabel++);
+    }
+  }
+
+  if(blobs.length===0) return{x:0,y:0,w:cellW,h:cellH};
+
+  // ── Step 3: Pick the RIGHT blob ──
+  // Primary: largest blob by pixel count.
+  // Tiebreak: closest to cell center (the main image is always centered).
+  const cellCenterX=mapW/2, cellCenterY=mapH/2;
+
+  // Score = size score - distance penalty
+  // This ensures a huge neighbor fragment doesn't beat the centered main image
+  const maxSize=Math.max(...blobs.map(b=>b.size));
+  blobs.forEach(b=>{
+    const distFromCenter=Math.hypot(b.centerX-cellCenterX,b.centerY-cellCenterY);
+    const maxDist=Math.hypot(mapW,mapH);
+    // Normalize: size 0-1, dist 0-1 (closer=better)
+    b.sizeScore=b.size/maxSize;
+    b.distScore=1-(distFromCenter/maxDist);
+    // Weight: 70% size, 30% proximity to center
+    b.score=b.sizeScore*0.7+b.distScore*0.3;
+  });
+
+  // But also: if gutterPct > 0, disqualify any blob whose center
+  // is entirely within the gutter zone (it's definitely a neighbor fragment)
+  const gx0map=Math.round(mapW*(gutterPct/100));
+  const gx1map=mapW-Math.round(mapW*(gutterPct/100));
+  const gy0map=Math.round(mapH*(gutterPct/100));
+  const gy1map=mapH-Math.round(mapH*(gutterPct/100));
+
+  const innerBlobs=blobs.filter(b=>
+    b.centerX>=gx0map && b.centerX<=gx1map &&
+    b.centerY>=gy0map && b.centerY<=gy1map
+  );
+
+  // Use inner blobs if any exist, otherwise fall back to all blobs
+  const candidates=innerBlobs.length>0 ? innerBlobs : blobs;
+  candidates.sort((a,b)=>b.score-a.score);
+  const main=candidates[0];
+
+  // ── Step 4: Now expand from the winning blob's bbox ──
+  // Convert map coords back to cell pixel coords
+  const margin=Math.max(6,Math.round(Math.min(cellW,cellH)*0.03));
+  let fx=(main.minX*STRIDE)-margin;
+  let fy=(main.minY*STRIDE)-margin;
+  let fx2=(main.maxX*STRIDE+STRIDE)+margin;
+  let fy2=(main.maxY*STRIDE+STRIDE)+margin;
+
+  // ── Step 5: Expand bbox to catch anti-aliased/feathered edges ──
+  // The downsampled map may miss soft edges; do a final pixel scan
+  // in a ring just outside the bbox to catch any content pixels
+  const FEATHER=Math.max(4,Math.round(Math.min(cellW,cellH)*0.02));
+  const scanX0=Math.max(0,fx-FEATHER);
+  const scanY0=Math.max(0,fy-FEATHER);
+  const scanX2=Math.min(cellW-1,fx2+FEATHER);
+  const scanY2=Math.min(cellH-1,fy2+FEATHER);
+  for(let cy=scanY0;cy<=scanY2;cy++){
+    for(let cx=scanX0;cx<=scanX2;cx++){
+      if(!isBgPx(cellX+cx,cellY+cy)){
+        if(cx<fx)fx=cx;if(cx>fx2)fx2=cx;
+        if(cy<fy)fy=cy;if(cy>fy2)fy2=cy;
+      }
+    }
+  }
+
+  // Clamp to cell bounds
+  fx=Math.max(0,fx);fy=Math.max(0,fy);
+  fx2=Math.min(cellW-1,fx2);fy2=Math.min(cellH-1,fy2);
+
+  return{x:fx,y:fy,w:fx2-fx+1,h:fy2-fy+1};
+}
+
+function detectBg(imgData,w,h){
+  const d=imgData.data;
+  const s=(x,y)=>{const i=(y*w+x)*4;return[d[i],d[i+1],d[i+2]]};
+  const pts=[s(0,0),s(w-1,0),s(0,h-1),s(w-1,h-1),s(Math.floor(w/2),0),s(Math.floor(w/2),h-1),s(0,Math.floor(h/2)),s(w-1,Math.floor(h/2))];
+  const avg=pts.reduce((a,c)=>[a[0]+c[0],a[1]+c[1],a[2]+c[2]],[0,0,0]);
+  return avg.map(v=>Math.round(v/pts.length));
+}
+
+function findBands(imgData,w,h,axis,bg,count){
+  const d=imgData.data;
+  const[bgR,bgG,bgB]=bg;
+  const size=axis==='row'?h:w,ortho=axis==='row'?w:h;
+  const density=new Float32Array(size);
+  for(let i=0;i<size;i++){
+    let n=0;
+    for(let j=0;j<ortho;j++){
+      const x=axis==='row'?j:i,y=axis==='row'?i:j;
+      const idx=(y*w+x)*4;
+      if(Math.abs(d[idx]-bgR)+Math.abs(d[idx+1]-bgG)+Math.abs(d[idx+2]-bgB)>30)n++;
+    }
+    density[i]=n/ortho;
+  }
+  const isCon=Array.from(density,v=>v>0.01);
+  const bands=[];let inB=false,bS=0;
+  for(let i=0;i<size;i++){
+    if(isCon[i]&&!inB){inB=true;bS=i}
+    else if(!isCon[i]&&inB){inB=false;bands.push([bS,i])}
+  }
+  if(inB)bands.push([bS,size]);
+  if(!bands.length)return evenSplit(size,count);
+  if(bands.length===count)return bands;
+  if(bands.length>count)return mergeBands(bands,count);
+  return evenSplit(size,count);
+}
+
+function mergeBands(bands,target){
+  bands=[...bands];
+  while(bands.length>target){
+    let mg=Infinity,mi=0;
+    for(let i=0;i<bands.length-1;i++){const g=bands[i+1][0]-bands[i][1];if(g<mg){mg=g;mi=i}}
+    bands.splice(mi,2,[bands[mi][0],bands[mi+1][1]]);
+  }
+  return bands;
+}
+
+function evenSplit(size,count){
+  const step=Math.floor(size/count);
+  return Array.from({length:count},(_,i)=>[i*step,(i+1)*step]);
+}
+</script>
+</body>
+</html>
