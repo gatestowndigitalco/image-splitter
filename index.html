@@ -154,9 +154,8 @@ main{flex:1;max-width:1200px;width:100%;margin:0 auto;padding:28px 22px 68px}
 .resgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
 .rcard{background:#fff;border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s}
 .rcard:hover{transform:translateY(-3px);box-shadow:var(--shm)}
-.cimgwrap{position:relative;width:100%;padding-top:100%;background:repeating-conic-gradient(#e2e2e2 0% 25%,#fff 0% 50%) 0 0/20px 20px;cursor:pointer;overflow:hidden}
-.cimgwrap:hover{background:repeating-conic-gradient(#d4d4d4 0% 25%,#f0f0f0 0% 50%) 0 0/20px 20px}
-.cimgwrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;padding:10px;transition:transform .2s}
+.cimgwrap{position:relative;width:100%;padding-top:100%;background:#fff;cursor:pointer;overflow:hidden}
+.cimgwrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
 .cimgwrap:hover img{transform:scale(1.04)}
 .zhint{position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:.62rem;padding:2px 6px;border-radius:4px;opacity:0;transition:opacity .2s;font-family:'Space Grotesk',sans-serif;pointer-events:none}
 .cimgwrap:hover .zhint{opacity:1}
