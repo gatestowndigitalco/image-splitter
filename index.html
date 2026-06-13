@@ -967,17 +967,25 @@ function tightCrop(imgData,imgW,imgH,cellX,cellY,cellW,cellH,gutterPct=4){
     return Math.abs(d[i]-bgR)+Math.abs(d[i+1]-bgG)+Math.abs(d[i+2]-bgB)<THRESH;
   };
 
-  // ── Step 1: Build a downsampled binary map of the cell ──
+  // ── Step 0: Trim the gutter off each edge of the cell BEFORE scanning ──
+  // This physically excludes any neighbor bleed-in near the cell borders
+  // so it can never become part of (or attach to) this cell's content blob.
+  const gutX=Math.min(Math.round(cellW*(gutterPct/100)),Math.floor((cellW-1)/2));
+  const gutY=Math.min(Math.round(cellH*(gutterPct/100)),Math.floor((cellH-1)/2));
+  const scanW=Math.max(1,cellW-gutX*2);
+  const scanH=Math.max(1,cellH-gutY*2);
+
+  // ── Step 1: Build a downsampled binary map of the trimmed scan region ──
   // We use a stride so even large cells process fast
-  const STRIDE=Math.max(1,Math.floor(Math.min(cellW,cellH)/120));
-  const mapW=Math.ceil(cellW/STRIDE);
-  const mapH=Math.ceil(cellH/STRIDE);
+  const STRIDE=Math.max(1,Math.floor(Math.min(scanW,scanH)/120));
+  const mapW=Math.ceil(scanW/STRIDE);
+  const mapH=Math.ceil(scanH/STRIDE);
   const map=new Uint8Array(mapW*mapH); // 1=content, 0=bg
 
   for(let my=0;my<mapH;my++){
     for(let mx=0;mx<mapW;mx++){
-      const gx=cellX+mx*STRIDE;
-      const gy=cellY+my*STRIDE;
+      const gx=cellX+gutX+mx*STRIDE;
+      const gy=cellY+gutY+my*STRIDE;
       map[my*mapW+mx]=isBgPx(gx,gy)?0:1;
     }
   }
@@ -1042,26 +1050,12 @@ function tightCrop(imgData,imgW,imgH,cellX,cellY,cellW,cellH,gutterPct=4){
     b.score=b.sizeScore*0.7+b.distScore*0.3;
   });
 
-  // But also: if gutterPct > 0, disqualify any blob whose center
-  // is entirely within the gutter zone (it's definitely a neighbor fragment)
-  const gx0map=Math.round(mapW*(gutterPct/100));
-  const gx1map=mapW-Math.round(mapW*(gutterPct/100));
-  const gy0map=Math.round(mapH*(gutterPct/100));
-  const gy1map=mapH-Math.round(mapH*(gutterPct/100));
-
-  const innerBlobs=blobs.filter(b=>
-    b.centerX>=gx0map && b.centerX<=gx1map &&
-    b.centerY>=gy0map && b.centerY<=gy1map
-  );
-
-  // Use inner blobs if any exist, otherwise fall back to all blobs
-  const candidates=innerBlobs.length>0 ? innerBlobs : blobs;
-  candidates.sort((a,b)=>b.score-a.score);
-  const main=candidates[0];
+  blobs.sort((a,b)=>b.score-a.score);
+  const main=blobs[0];
 
   // ── Step 4: Now expand from the winning blob's bbox ──
-  // Convert map coords back to cell pixel coords
-  const margin=Math.max(6,Math.round(Math.min(cellW,cellH)*0.03));
+  // Convert map coords back to scan-region pixel coords
+  const margin=Math.max(6,Math.round(Math.min(scanW,scanH)*0.03));
   let fx=(main.minX*STRIDE)-margin;
   let fy=(main.minY*STRIDE)-margin;
   let fx2=(main.maxX*STRIDE+STRIDE)+margin;
@@ -1069,26 +1063,29 @@ function tightCrop(imgData,imgW,imgH,cellX,cellY,cellW,cellH,gutterPct=4){
 
   // ── Step 5: Expand bbox to catch anti-aliased/feathered edges ──
   // The downsampled map may miss soft edges; do a final pixel scan
-  // in a ring just outside the bbox to catch any content pixels
-  const FEATHER=Math.max(4,Math.round(Math.min(cellW,cellH)*0.02));
+  // in a ring just outside the bbox to catch any content pixels.
+  // This stays within the trimmed scan region so neighbor bleed
+  // beyond the gutter can never be picked up.
+  const FEATHER=Math.max(4,Math.round(Math.min(scanW,scanH)*0.02));
   const scanX0=Math.max(0,fx-FEATHER);
   const scanY0=Math.max(0,fy-FEATHER);
-  const scanX2=Math.min(cellW-1,fx2+FEATHER);
-  const scanY2=Math.min(cellH-1,fy2+FEATHER);
+  const scanX2=Math.min(scanW-1,fx2+FEATHER);
+  const scanY2=Math.min(scanH-1,fy2+FEATHER);
   for(let cy=scanY0;cy<=scanY2;cy++){
     for(let cx=scanX0;cx<=scanX2;cx++){
-      if(!isBgPx(cellX+cx,cellY+cy)){
+      if(!isBgPx(cellX+gutX+cx,cellY+gutY+cy)){
         if(cx<fx)fx=cx;if(cx>fx2)fx2=cx;
         if(cy<fy)fy=cy;if(cy>fy2)fy2=cy;
       }
     }
   }
 
-  // Clamp to cell bounds
+  // Clamp to the trimmed scan region
   fx=Math.max(0,fx);fy=Math.max(0,fy);
-  fx2=Math.min(cellW-1,fx2);fy2=Math.min(cellH-1,fy2);
+  fx2=Math.min(scanW-1,fx2);fy2=Math.min(scanH-1,fy2);
 
-  return{x:fx,y:fy,w:fx2-fx+1,h:fy2-fy+1};
+  // Map back to cell-relative coordinates
+  return{x:gutX+fx,y:gutY+fy,w:fx2-fx+1,h:fy2-fy+1};
 }
 
 function detectBg(imgData,w,h){
